@@ -1,0 +1,1263 @@
+---
+layout: null
+permalink: /kalypso
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Us Menu</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a12;
+  --bg-card: #141422;
+  --bg-card-hover: #1a1a30;
+  --bg-surface: #1e1e35;
+  --gold: #d4a853;
+  --gold-dim: #b8923f;
+  --rose: #e8a0bf;
+  --rose-dim: rgba(232,160,191,0.15);
+  --text: #f0e6d3;
+  --text-dim: #a09888;
+  --text-muted: #6b6577;
+  --yes: #4ecdc4;
+  --yes-bg: rgba(78,205,196,0.12);
+  --maybe: #f7c948;
+  --maybe-bg: rgba(247,201,72,0.12);
+  --no: #ff6b6b;
+  --no-bg: rgba(255,107,107,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Utility ── */
+.hidden { display: none !important; }
+.serif { font-family: var(--font-serif); }
+
+/* ── Screen Container ── */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.screen.active { display: block; opacity: 1; }
+.screen-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+/* ── Welcome Screen ── */
+.welcome-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.welcome-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(212,168,83,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(232,160,191,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.welcome-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.2s forwards;
+}
+.welcome-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 8vw, 4rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.4s forwards;
+}
+.welcome-title .ampersand {
+  color: var(--rose);
+  font-style: italic;
+  font-weight: 400;
+}
+.welcome-subtitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  margin-bottom: 40px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.5s forwards;
+}
+.welcome-scroll-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.7s forwards;
+}
+.welcome-scroll-hint .arrow {
+  display: block;
+  margin-top: 8px;
+  font-size: 18px;
+  animation: bounce 2s ease infinite;
+}
+
+/* ── Agreement Section ── */
+.agreement-section {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 60px 24px 40px;
+}
+.agreement-heading {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 32px;
+}
+.agreement-heading .heart { color: var(--rose); }
+.agreement-intro {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 40px;
+  line-height: 1.7;
+}
+.promise-list { list-style: none; margin-bottom: 40px; }
+.promise-item {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.promise-item:last-child { border-bottom: none; }
+.promise-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--rose-dim);
+  color: var(--rose);
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 12px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.promise-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: inline;
+}
+.promise-desc {
+  display: block;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-top: 6px;
+  padding-left: 40px;
+  line-height: 1.6;
+}
+.agreement-rule {
+  text-align: center;
+  padding: 28px 20px;
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-surface));
+  border-radius: var(--radius);
+  border: 1px solid rgba(212,168,83,0.15);
+  margin-bottom: 48px;
+}
+.agreement-rule p {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--gold);
+  line-height: 1.6;
+}
+.agreement-signed {
+  text-align: center;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  margin-bottom: 48px;
+}
+.agreement-signed .names {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-top: 6px;
+}
+
+/* ── Begin Button ── */
+.btn-primary {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--bg);
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.5px;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212,168,83,0.3);
+}
+.btn-primary:active { transform: translateY(0); }
+.btn-secondary {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin: 12px auto 0;
+  padding: 14px 32px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 60px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.25);
+  color: var(--text);
+}
+
+/* ── Player Select ── */
+.player-select {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+}
+.player-select h2 {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+.player-select .subtitle {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-bottom: 40px;
+}
+.player-cards {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+}
+.player-card {
+  flex: 1;
+  padding: 32px 16px;
+  background: var(--bg-card);
+  border: 2px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+.player-card:hover {
+  border-color: var(--gold);
+  background: var(--bg-card-hover);
+  transform: translateY(-4px);
+}
+.player-card .avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+.player-card.marco .avatar { background: linear-gradient(135deg, #2d4a7a, #1a2d4d); }
+.player-card.kalypso .avatar { background: linear-gradient(135deg, #6b3a5c, #4a2040); }
+.player-card .name {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.player-lock-info {
+  margin-top: 32px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  max-width: 320px;
+}
+.player-lock-info svg {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* ── Menu Screen ── */
+.menu-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, var(--bg) 70%, transparent);
+  padding: 16px 0 20px;
+}
+.menu-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.menu-player-badge {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.menu-progress-text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--rose));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+/* ── Category Tabs ── */
+.category-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0 16px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.category-tabs::-webkit-scrollbar { display: none; }
+.category-tab {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 40px;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.category-tab:hover { color: var(--text-dim); border-color: rgba(255,255,255,0.12); }
+.category-tab.active {
+  color: var(--bg);
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.category-tab .tab-count {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* ── Menu Items ── */
+.menu-items { display: flex; flex-direction: column; gap: 12px; }
+.menu-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: var(--transition);
+}
+.menu-card.answered { border-color: rgba(255,255,255,0.1); }
+.menu-card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.menu-card-desc {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.menu-card-choices {
+  display: flex;
+  gap: 8px;
+}
+.choice-btn {
+  flex: 1;
+  padding: 10px 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.choice-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+.choice-btn.selected-yes {
+  border-color: var(--yes);
+  background: var(--yes-bg);
+  color: var(--yes);
+}
+.choice-btn.selected-maybe {
+  border-color: var(--maybe);
+  background: var(--maybe-bg);
+  color: var(--maybe);
+}
+.choice-btn.selected-no {
+  border-color: var(--no);
+  background: var(--no-bg);
+  color: var(--no);
+}
+.choice-btn .icon { font-size: 16px; }
+
+/* ── Menu Footer / Submit ── */
+.menu-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(0deg, var(--bg) 60%, transparent);
+  z-index: 100;
+  text-align: center;
+}
+.menu-footer .btn-primary { max-width: 400px; }
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Waiting Screen ── */
+.waiting-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+}
+.waiting-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--rose-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin-bottom: 24px;
+  animation: pulse 2s ease infinite;
+}
+.waiting-screen h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+.waiting-screen p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  max-width: 340px;
+  margin-bottom: 32px;
+}
+.waiting-status {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.status-badge {
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.status-badge.complete {
+  background: var(--yes-bg);
+  color: var(--yes);
+  border: 1px solid rgba(78,205,196,0.2);
+}
+.status-badge.pending {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-muted);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── Reveal Screen ── */
+.reveal-header {
+  text-align: center;
+  padding: 40px 0 32px;
+}
+.reveal-header h2 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+.reveal-header p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+.reveal-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  text-align: center;
+  padding: 20px 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.stat-number {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-number.yes-color { color: var(--yes); }
+.stat-number.maybe-color { color: var(--maybe); }
+.stat-number.no-color { color: var(--no); }
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.reveal-group {
+  margin-bottom: 28px;
+}
+.reveal-group-title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.reveal-group-title .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.reveal-group-title .dot.yes { background: var(--yes); }
+.reveal-group-title .dot.maybe { background: var(--maybe); }
+.reveal-group-title .dot.no { background: var(--no); }
+.reveal-group-title .dot.discuss { background: var(--text-muted); }
+.reveal-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 8px;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: revealIn 0.4s ease forwards;
+}
+.reveal-card-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+.reveal-choices {
+  display: flex;
+  gap: 12px;
+}
+.reveal-choice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.reveal-choice .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.reveal-choice .dot.yes { background: var(--yes); }
+.reveal-choice .dot.maybe { background: var(--maybe); }
+.reveal-choice .dot.no { background: var(--no); }
+.reveal-choice .label { color: var(--text-dim); }
+.reveal-choice .value { color: var(--text); text-transform: capitalize; }
+
+/* ── Curiosity Deck ── */
+.curiosity-section {
+  margin-top: 48px;
+  text-align: center;
+}
+.curiosity-section h3 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+.curiosity-section .subtitle {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+.curiosity-card-container {
+  position: relative;
+  min-height: 180px;
+  margin-bottom: 16px;
+}
+.curiosity-card {
+  background: linear-gradient(135deg, var(--bg-surface), var(--bg-card));
+  border: 1px solid rgba(212,168,83,0.15);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text);
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.curiosity-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.curiosity-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+.curiosity-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.curiosity-counter {
+  font-size: 13px;
+  color: var(--text-muted);
+  min-width: 40px;
+}
+
+/* ── Reset button ── */
+.reset-section {
+  text-align: center;
+  padding-top: 48px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: 48px;
+}
+.btn-danger {
+  display: inline-block;
+  padding: 10px 24px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--no);
+  background: transparent;
+  border: 1px solid rgba(255,107,107,0.2);
+  border-radius: 40px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-danger:hover {
+  background: var(--no-bg);
+  border-color: var(--no);
+}
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+@keyframes revealIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .player-cards { flex-direction: column; max-width: 260px; }
+  .reveal-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat-card { padding: 14px 8px; }
+  .stat-number { font-size: 1.6rem; }
+  .choice-btn { padding: 10px 8px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ────────────────────── SCREEN 1: WELCOME ────────────────────── -->
+<div id="screen-welcome" class="screen active">
+  <div class="welcome-hero">
+    <div class="welcome-badge">A Relationship Discovery</div>
+    <h1 class="welcome-title">Marco <span class="ampersand">&</span> Kalypso</h1>
+    <p class="welcome-subtitle">The Us Menu &mdash; Version 1.0</p>
+    <div class="welcome-scroll-hint">
+      Read our agreement below
+      <span class="arrow">&darr;</span>
+    </div>
+  </div>
+
+  <div class="agreement-section">
+    <h2 class="agreement-heading">The Us Agreement <span class="heart">&hearts;</span></h2>
+
+    <p class="agreement-intro">
+      We don't need to define ourselves by what a relationship is supposed to look like.
+      We have something beautiful, unconventional and uniquely ours. We want to discover
+      what brings each of us joy, comfort, connection, freedom and fulfillment.
+    </p>
+
+    <div class="agreement-rule">
+      <p>Love is freely given. Attraction is never owed.<br>Everything is an invitation, not an obligation.</p>
+    </div>
+
+    <h3 style="font-family:var(--font-serif);font-size:1.2rem;margin-bottom:20px;text-align:center;color:var(--gold);">Our Five Promises</h3>
+
+    <ol class="promise-list">
+      <li class="promise-item">
+        <span class="promise-number">1</span>
+        <span class="promise-title">Love is not a transaction.</span>
+        <span class="promise-desc">Kindness, generosity, emotional support, gifts and experiences are freely offered. None of these creates an obligation for romance, sex or anything in return.</span>
+      </li>
+      <li class="promise-item">
+        <span class="promise-number">2</span>
+        <span class="promise-title">We honor attraction as it exists.</span>
+        <span class="promise-desc">We don't need to force chemistry, and neither person has to apologize for not feeling something.</span>
+      </li>
+      <li class="promise-item">
+        <span class="promise-number">3</span>
+        <span class="promise-title">Curiosity over expectations.</span>
+        <span class="promise-desc">We're free to explore different forms of connection, including touch and intimacy, only when both of us genuinely want to.</span>
+      </li>
+      <li class="promise-item">
+        <span class="promise-number">4</span>
+        <span class="promise-title">Freedom and honesty coexist.</span>
+        <span class="promise-desc">We can develop meaningful connections with other people while being thoughtful and transparent about our own boundaries.</span>
+      </li>
+      <li class="promise-item">
+        <span class="promise-number">5</span>
+        <span class="promise-title">We can always change our minds.</span>
+        <span class="promise-desc">A Yes today isn't a Yes forever. A Maybe isn't a promise. A No deserves respect without debate.</span>
+      </li>
+    </ol>
+
+    <p class="agreement-signed">
+      Signed with love, freedom and curiosity,
+      <span class="names">Marco &hearts; Kalypso</span>
+    </p>
+    <p style="text-align:center;color:var(--text-muted);font-size:0.8rem;font-style:italic;margin-bottom:48px;">This is a living agreement. We can revisit it whenever our feelings or circumstances change.</p>
+
+    <button class="btn-primary" onclick="showScreen('screen-player-select')">Begin Our Discovery</button>
+  </div>
+</div>
+
+<!-- ────────────────────── SCREEN 2: PLAYER SELECT ────────────────────── -->
+<div id="screen-player-select" class="screen">
+  <div class="player-select">
+    <h2 class="serif">Who are you?</h2>
+    <p class="subtitle">Each person fills out the menu separately, then we compare.</p>
+    <div class="player-cards">
+      <div class="player-card marco" onclick="selectPlayer('marco')">
+        <div class="avatar">M</div>
+        <div class="name">Marco</div>
+      </div>
+      <div class="player-card kalypso" onclick="selectPlayer('kalypso')">
+        <div class="avatar">K</div>
+        <div class="name">Kalypso</div>
+      </div>
+    </div>
+    <p class="player-lock-info">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      Your answers are saved privately on this device. Your partner won't see them until you both choose to reveal.
+    </p>
+  </div>
+</div>
+
+<!-- ────────────────────── SCREEN 3: MENU ────────────────────── -->
+<div id="screen-menu" class="screen">
+  <div class="screen-inner">
+    <div class="menu-header">
+      <div class="menu-header-inner">
+        <span class="menu-player-badge" id="menu-player-name"></span>
+        <span class="menu-progress-text" id="menu-progress-text">0 / 20</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="category-tabs" id="category-tabs"></div>
+    <div class="menu-items" id="menu-items"></div>
+  </div>
+
+  <div class="menu-footer">
+    <button class="btn-primary" id="menu-submit-btn" disabled onclick="submitMenu()">
+      Complete My Selections
+    </button>
+  </div>
+</div>
+
+<!-- ────────────────────── SCREEN 4: WAITING ────────────────────── -->
+<div id="screen-waiting" class="screen">
+  <div class="waiting-screen">
+    <div class="waiting-icon">&hearts;</div>
+    <h2 class="serif">Selections Saved</h2>
+    <p id="waiting-message">Your answers are locked in. When your partner completes theirs on their device, come back to reveal together.</p>
+    <div class="waiting-status" id="waiting-status"></div>
+    <button class="btn-primary" id="btn-reveal" onclick="showScreen('screen-reveal'); renderReveal();" style="display:none;">
+      Reveal Our Answers
+    </button>
+    <button class="btn-secondary" onclick="showScreen('screen-player-select')">
+      Switch Player
+    </button>
+    <button class="btn-secondary" style="margin-top:8px;" onclick="editSelections()">
+      Edit My Answers
+    </button>
+  </div>
+</div>
+
+<!-- ────────────────────── SCREEN 5: REVEAL ────────────────────── -->
+<div id="screen-reveal" class="screen">
+  <div class="screen-inner">
+    <div class="reveal-header">
+      <h2 class="serif">Our Discovery</h2>
+      <p>Here's what we each said, side by side.</p>
+    </div>
+    <div class="reveal-stats" id="reveal-stats"></div>
+    <div id="reveal-results"></div>
+
+    <!-- Curiosity Deck -->
+    <div class="curiosity-section">
+      <h3 class="serif">The Curiosity Deck</h3>
+      <p class="subtitle">Conversation starters for your next date night</p>
+      <div class="curiosity-card-container">
+        <div class="curiosity-card" id="curiosity-card"></div>
+      </div>
+      <div class="curiosity-nav">
+        <button class="curiosity-btn" onclick="prevCuriosityCard()">&larr;</button>
+        <span class="curiosity-counter" id="curiosity-counter">1 / 10</span>
+        <button class="curiosity-btn" onclick="nextCuriosityCard()">&rarr;</button>
+      </div>
+    </div>
+
+    <div class="reset-section">
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Want to start over?</p>
+      <button class="btn-danger" onclick="resetAll()">Reset Everything</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data ──
+const CATEGORIES = [
+  {
+    id: 'physical',
+    name: 'Physical Connection',
+    items: [
+      { id: 'holding_hands', title: 'Holding hands', desc: 'Affectionate touch in everyday moments.' },
+      { id: 'hugging', title: 'Hugging', desc: 'Warm, affectionate embraces.' },
+      { id: 'cuddling', title: 'Cuddling', desc: 'Physical closeness and comfort without an expectation of sex.' },
+      { id: 'massages', title: 'Giving & receiving massages', desc: 'Nurturing touch with clear boundaries.' },
+      { id: 'kissing', title: 'Kissing', desc: 'Exploring if kissing feels enjoyable, without a goal.' },
+      { id: 'sexual_intimacy', title: 'Sexual intimacy', desc: 'Only if both genuinely desire it in the moment.' },
+      { id: 'flirting', title: 'Flirting & playful teasing', desc: 'Exploring playful, romantic or sensual energy.' },
+    ]
+  },
+  {
+    id: 'care',
+    name: 'Care & Support',
+    items: [
+      { id: 'emotional_support', title: 'Emotional support & deep conversations', desc: 'Being a safe space for each other\'s feelings.' },
+      { id: 'acts_of_service', title: 'Acts of service', desc: 'Cooking, helping, errands \u2014 showing love through doing.' },
+      { id: 'gift_giving', title: 'Gift giving & receiving', desc: 'Thoughtful tokens of affection without strings.' },
+      { id: 'words_of_affirmation', title: 'Words of affirmation', desc: 'Verbal encouragement, compliments, and love.' },
+      { id: 'emergency_contact', title: 'Being each other\u2019s emergency contact', desc: 'A signal of deep trust and reliability.' },
+    ]
+  },
+  {
+    id: 'life',
+    name: 'Life Together',
+    items: [
+      { id: 'travel', title: 'Traveling & adventures together', desc: 'Exploring the world as a team.' },
+      { id: 'living_together', title: 'Living together', desc: 'Sharing a home and daily life.' },
+      { id: 'families', title: 'Meeting each other\u2019s families', desc: 'Blending into each other\u2019s worlds.' },
+      { id: 'creative_projects', title: 'Creative projects together', desc: 'Building something meaningful side by side.' },
+      { id: 'date_nights', title: 'Regular date nights', desc: 'Intentional time for connection and fun.' },
+    ]
+  },
+  {
+    id: 'commitment',
+    name: 'Commitment',
+    items: [
+      { id: 'exclusivity_romantic', title: 'Romantic exclusivity', desc: 'Only pursuing romance with each other.' },
+      { id: 'exclusivity_sexual', title: 'Sexual exclusivity', desc: 'Physical intimacy only with each other.' },
+      { id: 'marriage', title: 'Marriage', desc: 'A legal and symbolic union.' },
+      { id: 'children', title: 'Having children together', desc: 'Building a family.' },
+      { id: 'long_term', title: 'Long-term life planning', desc: 'Making big decisions as partners.' },
+      { id: 'public_acknowledgment', title: 'Public relationship acknowledgment', desc: 'Being open about your connection with others.' },
+    ]
+  }
+];
+
+const CURIOSITY_CARDS = [
+  "What\u2019s one thing I do that makes you feel deeply cared for?",
+  "Is there something you\u2019ve wanted to tell me but haven\u2019t found the right moment?",
+  "What does \u201Csafety\u201D feel like to you in a relationship?",
+  "What\u2019s a dream you\u2019d love for us to experience together?",
+  "How do you like to be comforted when you\u2019re having a hard day?",
+  "Is there a way I show affection that surprises or delights you?",
+  "What\u2019s something you admire about us that\u2019s different from other connections you\u2019ve had?",
+  "If we could design one perfect day together, what would it look like?",
+  "What boundary of yours do you want me to understand better?",
+  "What\u2019s one thing about our connection you never want to change?"
+];
+
+const ALL_ITEMS = CATEGORIES.flatMap(c => c.items);
+const TOTAL = ALL_ITEMS.length;
+
+// ── State ──
+let currentPlayer = null;
+let currentCategory = CATEGORIES[0].id;
+let selections = {};
+let curiosityIndex = 0;
+
+// ── Storage ──
+function storageKey(player) { return 'us_menu_' + player; }
+function loadSelections(player) {
+  try {
+    return JSON.parse(localStorage.getItem(storageKey(player))) || {};
+  } catch { return {}; }
+}
+function saveSelections(player, sel) {
+  localStorage.setItem(storageKey(player), JSON.stringify(sel));
+}
+function hasCompleted(player) {
+  const sel = loadSelections(player);
+  return Object.keys(sel).length === TOTAL;
+}
+
+// ── Navigation ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById(id);
+  screen.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Player Select ──
+function selectPlayer(player) {
+  currentPlayer = player;
+  selections = loadSelections(player);
+  // If already completed, go to waiting
+  if (hasCompleted(player)) {
+    showWaiting();
+    return;
+  }
+  renderMenu();
+  showScreen('screen-menu');
+}
+
+function editSelections() {
+  selections = loadSelections(currentPlayer);
+  renderMenu();
+  showScreen('screen-menu');
+}
+
+// ── Menu Rendering ──
+function renderMenu() {
+  document.getElementById('menu-player-name').textContent = currentPlayer.toUpperCase() + "'S MENU";
+
+  // Tabs
+  const tabsEl = document.getElementById('category-tabs');
+  tabsEl.innerHTML = CATEGORIES.map(c => {
+    const count = c.items.filter(i => selections[i.id]).length;
+    const active = c.id === currentCategory ? ' active' : '';
+    return `<button class="category-tab${active}" onclick="switchCategory('${c.id}')">${c.name}<span class="tab-count">${count}/${c.items.length}</span></button>`;
+  }).join('');
+
+  // Items
+  renderItems();
+  updateProgress();
+}
+
+function switchCategory(catId) {
+  currentCategory = catId;
+  renderMenu();
+}
+
+function renderItems() {
+  const cat = CATEGORIES.find(c => c.id === currentCategory);
+  const el = document.getElementById('menu-items');
+  el.innerHTML = cat.items.map(item => {
+    const sel = selections[item.id] || '';
+    const answered = sel ? ' answered' : '';
+    return `
+      <div class="menu-card${answered}">
+        <div class="menu-card-title">${item.title}</div>
+        <div class="menu-card-desc">${item.desc}</div>
+        <div class="menu-card-choices">
+          <button class="choice-btn${sel === 'yes' ? ' selected-yes' : ''}" onclick="choose('${item.id}','yes')">
+            <span class="icon">\u2713</span> Yes
+          </button>
+          <button class="choice-btn${sel === 'maybe' ? ' selected-maybe' : ''}" onclick="choose('${item.id}','maybe')">
+            <span class="icon">~</span> Maybe
+          </button>
+          <button class="choice-btn${sel === 'no' ? ' selected-no' : ''}" onclick="choose('${item.id}','no')">
+            <span class="icon">\u2717</span> No
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function choose(itemId, value) {
+  // Toggle: if already selected, deselect
+  if (selections[itemId] === value) {
+    delete selections[itemId];
+  } else {
+    selections[itemId] = value;
+  }
+  saveSelections(currentPlayer, selections);
+  renderItems();
+  updateProgress();
+  renderMenu(); // update tab counts
+}
+
+function updateProgress() {
+  const answered = Object.keys(selections).length;
+  document.getElementById('menu-progress-text').textContent = `${answered} / ${TOTAL}`;
+  document.getElementById('progress-fill').style.width = `${(answered / TOTAL) * 100}%`;
+  document.getElementById('menu-submit-btn').disabled = answered < TOTAL;
+}
+
+function submitMenu() {
+  saveSelections(currentPlayer, selections);
+  showWaiting();
+}
+
+// ── Waiting ──
+function showWaiting() {
+  showScreen('screen-waiting');
+  const other = currentPlayer === 'marco' ? 'kalypso' : 'marco';
+  const otherDone = hasCompleted(other);
+  const meDone = hasCompleted(currentPlayer);
+
+  const statusEl = document.getElementById('waiting-status');
+  statusEl.innerHTML = `
+    <span class="status-badge ${meDone ? 'complete' : 'pending'}">${capitalize(currentPlayer)}: ${meDone ? 'Done' : 'In Progress'}</span>
+    <span class="status-badge ${otherDone ? 'complete' : 'pending'}">${capitalize(other)}: ${otherDone ? 'Done' : 'Waiting'}</span>
+  `;
+
+  const revealBtn = document.getElementById('btn-reveal');
+  if (meDone && otherDone) {
+    revealBtn.style.display = 'block';
+    document.getElementById('waiting-message').textContent = 'You\u2019re both done! When you\u2019re ready, reveal your answers together.';
+  } else {
+    revealBtn.style.display = 'none';
+    document.getElementById('waiting-message').textContent = 'Your answers are locked in. When your partner completes theirs on their device, come back to reveal together.';
+  }
+}
+
+// ── Reveal ──
+function renderReveal() {
+  const marcoSel = loadSelections('marco');
+  const kalypsoSel = loadSelections('kalypso');
+
+  // Stats
+  let mutualYes = 0, explore = 0, boundaries = 0;
+
+  const results = ALL_ITEMS.map(item => {
+    const m = marcoSel[item.id] || 'unanswered';
+    const k = kalypsoSel[item.id] || 'unanswered';
+    let group;
+    if (m === 'yes' && k === 'yes') { group = 'mutual_yes'; mutualYes++; }
+    else if ((m === 'yes' || m === 'maybe') && (k === 'yes' || k === 'maybe')) { group = 'explore'; explore++; }
+    else if (m === 'no' || k === 'no') { group = 'boundary'; boundaries++; }
+    else { group = 'discuss'; }
+    return { ...item, marco: m, kalypso: k, group };
+  });
+
+  // Stats
+  document.getElementById('reveal-stats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-number yes-color">${mutualYes}</div>
+      <div class="stat-label">Mutual Yes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number maybe-color">${explore}</div>
+      <div class="stat-label">Explore</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number no-color">${boundaries}</div>
+      <div class="stat-label">Boundaries</div>
+    </div>
+  `;
+
+  // Groups
+  const groups = [
+    { id: 'mutual_yes', title: 'Mutual Yes', dotClass: 'yes', emoji: '\u2713' },
+    { id: 'explore', title: 'Worth Exploring', dotClass: 'maybe', emoji: '~' },
+    { id: 'boundary', title: 'Boundaries to Honor', dotClass: 'no', emoji: '\u2717' },
+    { id: 'discuss', title: 'Still to Discuss', dotClass: 'discuss', emoji: '?' },
+  ];
+
+  let html = '';
+  let delay = 0;
+  groups.forEach(g => {
+    const items = results.filter(r => r.group === g.id);
+    if (items.length === 0) return;
+    html += `<div class="reveal-group">
+      <div class="reveal-group-title"><span class="dot ${g.dotClass}"></span>${g.title} (${items.length})</div>`;
+    items.forEach(item => {
+      html += `<div class="reveal-card" style="animation-delay:${delay}ms">
+        <div class="reveal-card-name">${item.title}</div>
+        <div class="reveal-choices">
+          <div class="reveal-choice">
+            <span class="dot ${item.marco}"></span>
+            <span class="label">Marco:</span>
+            <span class="value">${item.marco}</span>
+          </div>
+          <div class="reveal-choice">
+            <span class="dot ${item.kalypso}"></span>
+            <span class="label">Kalypso:</span>
+            <span class="value">${item.kalypso}</span>
+          </div>
+        </div>
+      </div>`;
+      delay += 60;
+    });
+    html += '</div>';
+  });
+
+  document.getElementById('reveal-results').innerHTML = html;
+  renderCuriosityCard();
+}
+
+// ── Curiosity Deck ──
+function renderCuriosityCard() {
+  document.getElementById('curiosity-card').textContent = CURIOSITY_CARDS[curiosityIndex];
+  document.getElementById('curiosity-counter').textContent = `${curiosityIndex + 1} / ${CURIOSITY_CARDS.length}`;
+}
+function nextCuriosityCard() {
+  curiosityIndex = (curiosityIndex + 1) % CURIOSITY_CARDS.length;
+  renderCuriosityCard();
+}
+function prevCuriosityCard() {
+  curiosityIndex = (curiosityIndex - 1 + CURIOSITY_CARDS.length) % CURIOSITY_CARDS.length;
+  renderCuriosityCard();
+}
+
+// ── Reset ──
+function resetAll() {
+  if (!confirm('This will erase both players\u2019 selections. Are you sure?')) return;
+  localStorage.removeItem(storageKey('marco'));
+  localStorage.removeItem(storageKey('kalypso'));
+  selections = {};
+  currentPlayer = null;
+  showScreen('screen-welcome');
+}
+
+// ── Helpers ──
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ── Init: check if returning ──
+(function init() {
+  // If both done and we have a player, show reveal option
+  // Otherwise start at welcome
+  showScreen('screen-welcome');
+})();
+</script>
+
+</body>
+</html>
