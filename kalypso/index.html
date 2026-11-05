@@ -938,8 +938,22 @@ body {
 </div>
 
 <script>
-// ── Data ──
-const CATEGORIES = [
+// ── Config ──
+// Paste your Firebase config object here (same as in admin/index.html)
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDfOoHlVrnS2RbJgQxtIDwGRzyKCEGeC_k",
+  authDomain: "relationship-menu.firebaseapp.com",
+  projectId: "relationship-menu",
+  storageBucket: "relationship-menu.firebasestorage.app",
+  messagingSenderId: "792777633837",
+  appId: "1:792777633837:web:a505efe2653dafc8ed48a4",
+  measurementId: "G-0BNMJ9FDBJ"
+};
+const CACHE_KEY = 'kalypso_menu_cache';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// ── Fallback Data ──
+const FALLBACK_CATEGORIES = [
   {
     id: 'physical',
     name: 'Physical Connection',
@@ -989,7 +1003,7 @@ const CATEGORIES = [
   }
 ];
 
-const CURIOSITY_CARDS = [
+const FALLBACK_CURIOSITY_CARDS = [
   "What\u2019s one thing I do that makes you feel deeply cared for?",
   "Is there something you\u2019ve wanted to tell me but haven\u2019t found the right moment?",
   "What does \u201Csafety\u201D feel like to you in a relationship?",
@@ -1002,8 +1016,11 @@ const CURIOSITY_CARDS = [
   "What\u2019s one thing about our connection you never want to change?"
 ];
 
-const ALL_ITEMS = CATEGORIES.flatMap(c => c.items);
-const TOTAL = ALL_ITEMS.length;
+// ── Live Data (overwritten by fetch, falls back to hardcoded) ──
+let CATEGORIES = JSON.parse(JSON.stringify(FALLBACK_CATEGORIES));
+let ALL_ITEMS = CATEGORIES.flatMap(c => c.items);
+let TOTAL = ALL_ITEMS.length;
+let CURIOSITY_CARDS = [...FALLBACK_CURIOSITY_CARDS];
 
 // ── State ──
 let currentPlayer = null;
@@ -1251,10 +1268,121 @@ function resetAll() {
 // ── Helpers ──
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
+// ── Async Data Loading ──
+async function loadMenuData() {
+  const firebaseConfigured = FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.projectId.length > 0;
+  if (!firebaseConfigured) return; // No Firebase configured, use fallback
+
+  // Check localStorage cache
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < CACHE_TTL) {
+        applyData(data);
+        // Still fetch fresh data in background
+        fetchFromFirestore().catch(() => {});
+        return;
+      }
+    }
+  } catch { /* ignore cache errors */ }
+
+  // Fetch with timeout
+  await fetchFromFirestore();
+}
+
+let _firestoreDb = null;
+let _firestoreMods = null;
+
+async function fetchFromFirestore() {
+  try {
+    // Dynamic import of Firebase modular SDK (only loads when needed, cached after first load)
+    if (!_firestoreMods) {
+      const [appMod, fsMod] = await Promise.race([
+        Promise.all([
+          import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),
+          import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')
+        ]),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+      ]);
+      _firestoreMods = { initializeApp: appMod.initializeApp, getApp: appMod.getApp, ...fsMod };
+    }
+
+    const { initializeApp, getApp, getFirestore, collection, getDocs, query, orderBy } = _firestoreMods;
+
+    if (!_firestoreDb) {
+      let app;
+      try { app = getApp('kalypso-reader'); } catch { app = initializeApp(FIREBASE_CONFIG, 'kalypso-reader'); }
+      _firestoreDb = getFirestore(app);
+    }
+    const db = _firestoreDb;
+
+    const [catSnap, itemSnap, ccSnap] = await Promise.race([
+      Promise.all([
+        getDocs(query(collection(db, 'categories'), orderBy('sort_order'))),
+        getDocs(query(collection(db, 'items'), orderBy('sort_order'))),
+        getDocs(query(collection(db, 'curiosityCards'), orderBy('sort_order')))
+      ]),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+    ]);
+
+    // Transform Firestore data into nested format matching FALLBACK_CATEGORIES
+    const rawCategories = catSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const rawItems = itemSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const rawCards = ccSnap.docs.map(d => d.data().text);
+
+    if (rawCategories.length === 0) return; // Firestore empty, keep fallback
+
+    const nestedCategories = rawCategories.map(cat => ({
+      id: cat.id,
+      name: cat.name,
+      items: rawItems
+        .filter(item => item.category_id === cat.id)
+        .map(item => ({ id: item.id, title: item.title, desc: item.desc || '' }))
+    }));
+
+    const data = {
+      categories: nestedCategories,
+      curiosityCards: rawCards.length > 0 ? rawCards : null
+    };
+
+    applyData(data);
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch {
+    // Fetch failed — fallback data remains active
+  }
+}
+
+function applyData(data) {
+  if (data.categories && data.categories.length > 0) {
+    CATEGORIES = data.categories;
+    ALL_ITEMS = CATEGORIES.flatMap(c => c.items);
+    TOTAL = ALL_ITEMS.length;
+  }
+  if (data.curiosityCards && data.curiosityCards.length > 0) {
+    CURIOSITY_CARDS = data.curiosityCards;
+  }
+  // Prune stale selections if items changed
+  reconcileSelections('marco');
+  reconcileSelections('kalypso');
+}
+
+function reconcileSelections(player) {
+  const sel = loadSelections(player);
+  const validIds = new Set(ALL_ITEMS.map(i => i.id));
+  let changed = false;
+  for (const key of Object.keys(sel)) {
+    if (!validIds.has(key)) {
+      delete sel[key];
+      changed = true;
+    }
+  }
+  if (changed) saveSelections(player, sel);
+}
+
 // ── Init: check if returning ──
-(function init() {
-  // If both done and we have a player, show reveal option
-  // Otherwise start at welcome
+(async function init() {
+  await loadMenuData();
   showScreen('screen-welcome');
 })();
 </script>

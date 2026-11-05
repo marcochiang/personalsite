@@ -2,50 +2,96 @@
 layout: about
 title: Marco Chiang
 description: >
-  Flying pole aerialist, movement artist, and content creator. Available for bookings worldwide.
+  Toca, a.k.a. Marco Chiang, is a flying pole aerialist, movement artist, creator, and storyteller. Available for bookings worldwide.
 image: /assets/img/about/flying-pole-pier.jpg
 ---
 
+<!-- ======================== 1. HERO ======================== -->
 <div class="hero-section">
   <div class="hero-image-wrapper">
     <img src="/assets/img/about/flying-pole-pier.jpg" alt="Marco Chiang performing flying pole under a pier" class="hero-image">
     <div class="hero-overlay"></div>
   </div>
   <div class="hero-content">
-    <p class="hero-eyebrow">Flying Pole Artist</p>
+    <p class="hero-eyebrow">Toca &mdash; The Kinetic Heart</p>
     <h1 class="hero-title">Marco Chiang</h1>
-    <p class="hero-subtitle">Aerial performance that moves you</p>
-    <a href="mailto:marcochiangtw@gmail.com?subject=Booking%20Inquiry" class="hero-cta">Book Me for Your Event</a>
+    <p class="hero-subtitle">Aerialist. Creator. Storyteller.</p>
+    <a href="mailto:marcochiangtw@gmail.com?subject=Let%27s%20Connect" class="hero-cta">Connect with Me</a>
   </div>
   <div class="scroll-indicator">
     <span></span>
   </div>
 </div>
 
+<!-- ======================== 2. ESSENCE ======================== -->
 <div class="section-wrapper fade-in-section">
-  <h2 class="section-heading">About</h2>
+  <h2 class="section-heading">Essence</h2>
   <p class="section-body">
-    I'm a <strong>traveling flying pole aerialist</strong> based wherever the next stage takes me. My performances blend strength, grace, and raw emotion — from underneath ocean piers to festival main stages.
+    Toca moves freely, loves abundantly, creates joy, and inspires people to feel safe expressing their most authentic selves.
   </p>
   <p class="section-body">
-    Beyond performance, I'm a movement artist, community builder, creator, and software engineer with 10+ years of experience. I believe art has the power to challenge, inspire, and connect us.
+    Beyond the stage, I'm a community builder, content creator, and software engineer with 12+ years of experience. I embody love, generosity, and freedom.
   </p>
 </div>
 
+<!-- ======================== 3. FIVE DIMENSIONS ======================== -->
 <div class="section-wrapper fade-in-section">
-  <h2 class="section-heading">Performing</h2>
+  <h2 class="section-heading">Five Dimensions</h2>
+  <div class="dimensions-grid">
+    <div class="dimension-card">
+      <div class="dimension-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Movement & Mastery</h3>
+      <p>Flying pole, aerial arts, and the endless pursuit of what the body can express through disciplined practice.</p>
+    </div>
+    <div class="dimension-card">
+      <div class="dimension-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M12 2a5 5 0 015 5c0 3-5 8-5 8s-5-5-5-8a5 5 0 015-5z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7" r="1.5"/><path d="M8 21h8M12 17v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Creative Expression</h3>
+      <p>Storytelling through movement, video, writing, and every medium that bridges the gap between feeling and form.</p>
+    </div>
+    <div class="dimension-card">
+      <div class="dimension-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Human Connection</h3>
+      <p>Building communities, fostering belonging, and creating spaces where people feel seen and inspired.</p>
+    </div>
+    <div class="dimension-card">
+      <div class="dimension-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Intentional Living</h3>
+      <p>Designing a life around what matters - experiences over possessions, depth over comfort, presence over performance.</p>
+    </div>
+    <div class="dimension-card">
+      <div class="dimension-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Courage & Vulnerability</h3>
+      <p>Leading with heart, showing up fully, and proving that strength and softness aren't opposites - they're partners.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== 4. PERFORMANCE / BOOKING ======================== -->
+<div class="section-wrapper fade-in-section">
+  <h2 class="section-heading">Performance</h2>
   <p class="section-body">
-    I specialize in <strong>flying pole</strong> — a discipline that combines the raw power of pole with the freedom of aerial arts. I perform at events, festivals, private shows, and creative collaborations around the world.
+    I specialize in <strong>flying pole</strong> - a discipline that combines the raw power of pole with the freedom of aerial arts. From underneath ocean piers to festival main stages, I bring performances that are athletic, emotional, and unforgettable.
   </p>
   <div class="booking-card">
     <div class="booking-card-inner">
       <h3>Available for Bookings</h3>
-      <p>Festivals, corporate events, private shows, music videos, creative collaborations — I travel anywhere the art takes me.</p>
+      <p>Festivals, corporate events, private shows, music videos, creative collaborations - I travel anywhere the art takes me.</p>
       <a href="mailto:marcochiangtw@gmail.com?subject=Booking%20Inquiry" class="booking-btn">Get in Touch</a>
     </div>
   </div>
 </div>
 
+<!-- ======================== 5. CONTENT & COMMUNITY ======================== -->
 <div class="section-wrapper fade-in-section">
   <h2 class="section-heading">Content & Community</h2>
   <p class="section-body">
@@ -71,10 +117,11 @@ image: /assets/img/about/flying-pole-pier.jpg
   </div>
 </div>
 
+<!-- ======================== 7. BACKGROUND ======================== -->
 <div class="section-wrapper fade-in-section">
   <h2 class="section-heading">Background</h2>
   <p class="section-body">
-    From 2014 to 2021 I lived in San Francisco building communities in movement, art, and technology. When the pandemic hit, I moved to Las Vegas and started a content house with five other creatives — my first step toward living a fully creative life.
+    From 2014 to 2021 I lived in San Francisco building communities in movement, art, and technology. When the pandemic hit, I moved to Las Vegas and started a content house with five other creatives - my first step toward living a fully creative life.
   </p>
   <div class="video-wrapper">
     <iframe width="560" height="315" src="https://www.youtube.com/embed/PzFLAuVxdcA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

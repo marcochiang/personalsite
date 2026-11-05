@@ -1,6 +1,25 @@
 // Custom inline styles — loaded on every page
 
 // ============================================
+// CSS CUSTOM PROPERTIES
+// ============================================
+
+:root {
+  --toca-bg: #0a0a1a;
+  --toca-text: #e8e6e1;
+  --toca-accent: #d4a853;
+  --toca-muted: rgba(232, 230, 225, 0.5);
+}
+
+// ============================================
+// BODY FONT OVERRIDE
+// ============================================
+
+body {
+  font-family: 'Inter', 'Noto Sans', Helvetica, Arial, sans-serif;
+}
+
+// ============================================
 // HERO SECTION
 // ============================================
 
@@ -27,7 +46,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 45%;
+  object-position: center 55%;
   transform: scale(1.05);
   animation: heroZoom 20s ease-in-out infinite alternate;
 }
@@ -92,8 +111,8 @@
 .hero-cta {
   display: inline-block;
   padding: 0.85rem 2.2rem;
-  background: #d4a853;
-  color: #fff;
+  background: #fff;
+  color: #0a0a1a;
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.05em;
@@ -102,13 +121,12 @@
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   opacity: 0;
   animation: fadeSlideUp 1s ease 0.9s forwards;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(212, 168, 83, 0.4);
-    background: #e0b96a;
-    color: #fff;
+    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.25);
+    background: #f0f0f0;
+    color: #0a0a1a;
     text-decoration: none;
   }
 }
@@ -402,6 +420,87 @@
   &.is-visible {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+// ============================================
+// FIVE DIMENSIONS GRID
+// ============================================
+
+.dimensions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-top: 2rem;
+
+  @media (min-width: 600px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (min-width: 960px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.dimension-card {
+  padding: 1.75rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(212, 168, 83, 0.4);
+    box-shadow: 0 12px 40px rgba(212, 168, 83, 0.1);
+  }
+
+  .dimension-icon {
+    color: var(--toca-accent);
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--toca-accent);
+  }
+
+  p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    opacity: 0.7;
+    margin: 0;
+  }
+}
+
+// Light mode adjustments for dimension cards
+[data-theme=light] .dimension-card,
+.light-mode .dimension-card {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+// ============================================
+// MANIFESTO SECTION
+// ============================================
+
+.manifesto-section {
+  margin-bottom: 4rem;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.manifesto-line {
+  font-size: clamp(1.3rem, 3.5vw, 2rem);
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--toca-text, inherit);
+  letter-spacing: -0.01em;
+
+  .gold-period {
+    color: var(--toca-accent);
+    font-weight: 700;
   }
 }
 

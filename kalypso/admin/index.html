@@ -1,0 +1,1079 @@
+---
+layout: null
+permalink: /kalypso/admin
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalypso Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Firebase Compat SDK (no build step needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a12;
+  --bg-card: #141422;
+  --bg-card-hover: #1a1a30;
+  --bg-surface: #1e1e35;
+  --gold: #d4a853;
+  --gold-dim: #b8923f;
+  --rose: #e8a0bf;
+  --rose-dim: rgba(232,160,191,0.15);
+  --text: #f0e6d3;
+  --text-dim: #a09888;
+  --text-muted: #6b6577;
+  --yes: #4ecdc4;
+  --no: #ff6b6b;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Login Gate */
+.login-gate {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+}
+.login-gate h1 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+.login-gate .subtitle {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-bottom: 32px;
+}
+.login-form {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+}
+.login-form input {
+  flex: 1;
+  padding: 12px 16px;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  outline: none;
+  transition: var(--transition);
+}
+.login-form input:focus { border-color: var(--gold); }
+.login-form input::placeholder { color: var(--text-muted); }
+.login-error {
+  color: var(--no);
+  font-size: 0.85rem;
+  margin-top: 12px;
+  min-height: 20px;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 24px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-gold {
+  color: var(--bg);
+  background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+}
+.btn-gold:hover { box-shadow: 0 4px 20px rgba(212,168,83,0.3); }
+.btn-gold:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-outline {
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.btn-outline:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+.btn-danger-outline {
+  color: var(--no);
+  background: transparent;
+  border: 1px solid rgba(255,107,107,0.2);
+}
+.btn-danger-outline:hover { background: rgba(255,107,107,0.1); border-color: var(--no); }
+.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+/* Dashboard Layout */
+.dashboard { display: none; max-width: 800px; margin: 0 auto; padding: 24px 20px 80px; }
+.dashboard.active { display: block; }
+
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.dash-header h1 {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+}
+.dash-header-actions { display: flex; gap: 8px; align-items: center; }
+
+/* Tabs */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.tab-btn {
+  padding: 10px 20px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.tab-btn:hover { color: var(--text-dim); }
+.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* Panel */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.panel-header h2 { font-size: 1rem; font-weight: 600; }
+
+/* Filter */
+.filter-bar {
+  margin-bottom: 16px;
+}
+.filter-bar select {
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+
+/* Sortable List */
+.sortable-list { list-style: none; }
+.sortable-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  cursor: grab;
+  transition: var(--transition);
+  user-select: none;
+}
+.sortable-item:hover { border-color: rgba(255,255,255,0.12); }
+.sortable-item.dragging {
+  opacity: 0.5;
+  border-color: var(--gold);
+}
+.sortable-item.drag-over {
+  border-color: var(--gold);
+  background: var(--bg-card-hover);
+}
+.drag-handle {
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: grab;
+  flex-shrink: 0;
+}
+.item-content { flex: 1; min-width: 0; }
+.item-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.item-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--bg-surface);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal h3 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  outline: none;
+  transition: var(--transition);
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus { border-color: var(--gold); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  padding: 12px 24px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text);
+  z-index: 2000;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: var(--yes); color: var(--yes); }
+.toast.error { border-color: var(--no); color: var(--no); }
+
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Config banner */
+.config-banner {
+  background: rgba(247,201,72,0.1);
+  border: 1px solid rgba(247,201,72,0.3);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+  color: #f7c948;
+}
+.config-banner code {
+  background: rgba(0,0,0,0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+/* Seed banner */
+.seed-banner {
+  background: rgba(78,205,196,0.1);
+  border: 1px solid rgba(78,205,196,0.3);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+  color: var(--yes);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.seed-banner span { flex: 1; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .sortable-item { padding: 10px 12px; gap: 8px; }
+  .item-actions .btn-sm { padding: 4px 8px; font-size: 0.75rem; }
+  .modal { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN GATE ── -->
+<div id="login-gate" class="login-gate">
+  <h1 style="font-family:var(--font-serif);">Kalypso Admin</h1>
+  <p class="subtitle">Manage your menu content</p>
+  <div class="login-form">
+    <input type="password" id="password-input" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')attemptLogin()">
+    <button class="btn btn-gold" onclick="attemptLogin()">Login</button>
+  </div>
+  <div class="login-error" id="login-error"></div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="dashboard" class="dashboard">
+  <div class="dash-header">
+    <h1>Kalypso Admin</h1>
+    <div class="dash-header-actions">
+      <button class="btn btn-outline btn-sm" onclick="refreshData()">Refresh</button>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div id="config-banner" class="config-banner" style="display:none;">
+    Set your Firebase config below before using the dashboard. Update the <code>FIREBASE_CONFIG</code> object in this file.
+  </div>
+
+  <div id="seed-banner" class="seed-banner" style="display:none;">
+    <span>Firestore is empty. Click to populate with default menu data.</span>
+    <button class="btn btn-gold btn-sm" onclick="seedData()">Seed Data</button>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('categories')">Categories</button>
+    <button class="tab-btn" onclick="switchTab('items')">Items</button>
+    <button class="tab-btn" onclick="switchTab('curiosity')">Curiosity Cards</button>
+  </div>
+
+  <!-- Categories Panel -->
+  <div id="panel-categories" class="tab-panel active">
+    <div class="panel-header">
+      <h2>Categories</h2>
+      <button class="btn btn-gold btn-sm" onclick="openAddCategory()">+ Add</button>
+    </div>
+    <ul class="sortable-list" id="list-categories"></ul>
+  </div>
+
+  <!-- Items Panel -->
+  <div id="panel-items" class="tab-panel">
+    <div class="panel-header">
+      <h2>Menu Items</h2>
+      <button class="btn btn-gold btn-sm" onclick="openAddItem()">+ Add</button>
+    </div>
+    <div class="filter-bar">
+      <select id="item-category-filter" onchange="renderItems()">
+        <option value="all">All Categories</option>
+      </select>
+    </div>
+    <ul class="sortable-list" id="list-items"></ul>
+  </div>
+
+  <!-- Curiosity Cards Panel -->
+  <div id="panel-curiosity" class="tab-panel">
+    <div class="panel-header">
+      <h2>Curiosity Cards</h2>
+      <button class="btn btn-gold btn-sm" onclick="openAddCuriosity()">+ Add</button>
+    </div>
+    <ul class="sortable-list" id="list-curiosity"></ul>
+  </div>
+</div>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+
+// Paste your Firebase config object here (from Firebase Console → Project Settings → Web App)
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDfOoHlVrnS2RbJgQxtIDwGRzyKCEGeC_k",
+  authDomain: "relationship-menu.firebaseapp.com",
+  projectId: "relationship-menu",
+  storageBucket: "relationship-menu.firebasestorage.app",
+  messagingSenderId: "792777633837",
+  appId: "1:792777633837:web:a505efe2653dafc8ed48a4",
+  measurementId: "G-0BNMJ9FDBJ"
+};
+
+// Client-side admin password gate
+const ADMIN_PASSWORD = 'kalypso2026';
+
+// ══════════════════════════════════════════
+// SEED DATA (matches fallback data in main page)
+// ══════════════════════════════════════════
+const SEED_CATEGORIES = [
+  { id: 'physical', name: 'Physical Connection', sort_order: 10 },
+  { id: 'care', name: 'Care & Support', sort_order: 20 },
+  { id: 'life', name: 'Life Together', sort_order: 30 },
+  { id: 'commitment', name: 'Commitment', sort_order: 40 }
+];
+
+const SEED_ITEMS = [
+  { id: 'holding_hands', category_id: 'physical', title: 'Holding hands', desc: 'Affectionate touch in everyday moments.', sort_order: 10 },
+  { id: 'hugging', category_id: 'physical', title: 'Hugging', desc: 'Warm, affectionate embraces.', sort_order: 20 },
+  { id: 'cuddling', category_id: 'physical', title: 'Cuddling', desc: 'Physical closeness and comfort without an expectation of sex.', sort_order: 30 },
+  { id: 'massages', category_id: 'physical', title: 'Giving & receiving massages', desc: 'Nurturing touch with clear boundaries.', sort_order: 40 },
+  { id: 'kissing', category_id: 'physical', title: 'Kissing', desc: 'Exploring if kissing feels enjoyable, without a goal.', sort_order: 50 },
+  { id: 'sexual_intimacy', category_id: 'physical', title: 'Sexual intimacy', desc: 'Only if both genuinely desire it in the moment.', sort_order: 60 },
+  { id: 'flirting', category_id: 'physical', title: 'Flirting & playful teasing', desc: 'Exploring playful, romantic or sensual energy.', sort_order: 70 },
+  { id: 'emotional_support', category_id: 'care', title: 'Emotional support & deep conversations', desc: "Being a safe space for each other's feelings.", sort_order: 10 },
+  { id: 'acts_of_service', category_id: 'care', title: 'Acts of service', desc: 'Cooking, helping, errands \u2014 showing love through doing.', sort_order: 20 },
+  { id: 'gift_giving', category_id: 'care', title: 'Gift giving & receiving', desc: 'Thoughtful tokens of affection without strings.', sort_order: 30 },
+  { id: 'words_of_affirmation', category_id: 'care', title: 'Words of affirmation', desc: 'Verbal encouragement, compliments, and love.', sort_order: 40 },
+  { id: 'emergency_contact', category_id: 'care', title: "Being each other\u2019s emergency contact", desc: 'A signal of deep trust and reliability.', sort_order: 50 },
+  { id: 'travel', category_id: 'life', title: 'Traveling & adventures together', desc: 'Exploring the world as a team.', sort_order: 10 },
+  { id: 'living_together', category_id: 'life', title: 'Living together', desc: 'Sharing a home and daily life.', sort_order: 20 },
+  { id: 'families', category_id: 'life', title: "Meeting each other\u2019s families", desc: "Blending into each other\u2019s worlds.", sort_order: 30 },
+  { id: 'creative_projects', category_id: 'life', title: 'Creative projects together', desc: 'Building something meaningful side by side.', sort_order: 40 },
+  { id: 'date_nights', category_id: 'life', title: 'Regular date nights', desc: 'Intentional time for connection and fun.', sort_order: 50 },
+  { id: 'exclusivity_romantic', category_id: 'commitment', title: 'Romantic exclusivity', desc: 'Only pursuing romance with each other.', sort_order: 10 },
+  { id: 'exclusivity_sexual', category_id: 'commitment', title: 'Sexual exclusivity', desc: 'Physical intimacy only with each other.', sort_order: 20 },
+  { id: 'marriage', category_id: 'commitment', title: 'Marriage', desc: 'A legal and symbolic union.', sort_order: 30 },
+  { id: 'children', category_id: 'commitment', title: 'Having children together', desc: 'Building a family.', sort_order: 40 },
+  { id: 'long_term', category_id: 'commitment', title: 'Long-term life planning', desc: 'Making big decisions as partners.', sort_order: 50 },
+  { id: 'public_acknowledgment', category_id: 'commitment', title: 'Public relationship acknowledgment', desc: 'Being open about your connection with others.', sort_order: 60 }
+];
+
+const SEED_CURIOSITY_CARDS = [
+  { id: 'cc_1', text: "What\u2019s one thing I do that makes you feel deeply cared for?", sort_order: 10 },
+  { id: 'cc_2', text: "Is there something you\u2019ve wanted to tell me but haven\u2019t found the right moment?", sort_order: 20 },
+  { id: 'cc_3', text: "What does \u201Csafety\u201D feel like to you in a relationship?", sort_order: 30 },
+  { id: 'cc_4', text: "What\u2019s a dream you\u2019d love for us to experience together?", sort_order: 40 },
+  { id: 'cc_5', text: "How do you like to be comforted when you\u2019re having a hard day?", sort_order: 50 },
+  { id: 'cc_6', text: "Is there a way I show affection that surprises or delights you?", sort_order: 60 },
+  { id: 'cc_7', text: "What\u2019s something you admire about us that\u2019s different from other connections you\u2019ve had?", sort_order: 70 },
+  { id: 'cc_8', text: "If we could design one perfect day together, what would it look like?", sort_order: 80 },
+  { id: 'cc_9', text: "What boundary of yours do you want me to understand better?", sort_order: 90 },
+  { id: 'cc_10', text: "What\u2019s one thing about our connection you never want to change?", sort_order: 100 }
+];
+
+// ══════════════════════════════════════════
+// FIREBASE INIT
+// ══════════════════════════════════════════
+let db = null;
+const firebaseConfigured = FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.projectId.length > 0;
+
+if (firebaseConfigured) {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.firestore();
+}
+
+// ── State ──
+let categories = [];
+let items = [];
+let curiosityCards = [];
+let activeTab = 'categories';
+let dragSrcEl = null;
+
+// ── Init ──
+(function init() {
+  const saved = sessionStorage.getItem('kalypso_admin_pw');
+  if (saved === ADMIN_PASSWORD) {
+    showDashboard();
+  }
+  if (!firebaseConfigured) {
+    document.getElementById('config-banner').style.display = 'block';
+  }
+})();
+
+// ── Auth ──
+function attemptLogin() {
+  const input = document.getElementById('password-input');
+  const pw = input.value.trim();
+  if (!pw) return;
+
+  if (pw === ADMIN_PASSWORD) {
+    sessionStorage.setItem('kalypso_admin_pw', pw);
+    showDashboard();
+  } else {
+    document.getElementById('login-error').textContent = 'Invalid password.';
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('kalypso_admin_pw');
+  document.getElementById('login-gate').style.display = '';
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('password-input').value = '';
+  document.getElementById('login-error').textContent = '';
+}
+
+function showDashboard() {
+  document.getElementById('login-gate').style.display = 'none';
+  document.getElementById('dashboard').classList.add('active');
+  refreshData();
+}
+
+// ── Data Loading (Firestore) ──
+async function refreshData() {
+  if (!firebaseConfigured) {
+    showToast('Set FIREBASE_CONFIG to connect to Firestore', 'error');
+    return;
+  }
+  try {
+    showToast('Loading...');
+    const [catSnap, itemSnap, ccSnap] = await Promise.all([
+      db.collection('categories').orderBy('sort_order').get(),
+      db.collection('items').orderBy('sort_order').get(),
+      db.collection('curiosityCards').orderBy('sort_order').get()
+    ]);
+
+    categories = catSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    items = itemSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    curiosityCards = ccSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Show seed banner if Firestore is empty
+    const isEmpty = categories.length === 0 && items.length === 0 && curiosityCards.length === 0;
+    document.getElementById('seed-banner').style.display = isEmpty ? 'flex' : 'none';
+
+    renderAll();
+    showToast('Data loaded', 'success');
+  } catch (e) {
+    showToast('Failed to load data: ' + e.message, 'error');
+  }
+}
+
+// ── Seed Data ──
+async function seedData() {
+  if (!firebaseConfigured) {
+    showToast('Set FIREBASE_CONFIG first', 'error');
+    return;
+  }
+  if (!confirm('This will populate Firestore with default menu data. Continue?')) return;
+
+  try {
+    showToast('Seeding data...');
+    const batch = db.batch();
+
+    SEED_CATEGORIES.forEach(cat => {
+      const ref = db.collection('categories').doc(cat.id);
+      batch.set(ref, { name: cat.name, sort_order: cat.sort_order });
+    });
+
+    SEED_ITEMS.forEach(item => {
+      const ref = db.collection('items').doc(item.id);
+      batch.set(ref, {
+        category_id: item.category_id,
+        title: item.title,
+        desc: item.desc,
+        sort_order: item.sort_order
+      });
+    });
+
+    SEED_CURIOSITY_CARDS.forEach(card => {
+      const ref = db.collection('curiosityCards').doc(card.id);
+      batch.set(ref, { text: card.text, sort_order: card.sort_order });
+    });
+
+    await batch.commit();
+    showToast('Seeded 37 documents!', 'success');
+    await refreshData();
+  } catch (e) {
+    showToast('Seed failed: ' + e.message, 'error');
+  }
+}
+
+// ── Rendering ──
+function renderAll() {
+  renderCategories();
+  renderCategoryFilter();
+  renderItems();
+  renderCuriosityCards();
+}
+
+function renderCategories() {
+  const list = document.getElementById('list-categories');
+  list.innerHTML = categories.map((cat, i) => `
+    <li class="sortable-item" draggable="true" data-id="${cat.id}" data-index="${i}" data-collection="categories">
+      <span class="drag-handle">\u2261</span>
+      <div class="item-content">
+        <div class="item-title">${esc(cat.name)}</div>
+        <div class="item-meta">ID: ${esc(cat.id)} &middot; Sort: ${cat.sort_order}</div>
+      </div>
+      <div class="item-actions">
+        <button class="btn btn-outline btn-sm" onclick="openEditCategory(${i})">Edit</button>
+        <button class="btn btn-danger-outline btn-sm" onclick="deleteEntry('categories','${cat.id}','${esc(cat.name)}')">Del</button>
+      </div>
+    </li>
+  `).join('');
+  attachDragListeners(list);
+}
+
+function renderCategoryFilter() {
+  const select = document.getElementById('item-category-filter');
+  const current = select.value;
+  select.innerHTML = '<option value="all">All Categories</option>' +
+    categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  select.value = current || 'all';
+}
+
+function renderItems() {
+  const filter = document.getElementById('item-category-filter').value;
+  const filtered = filter === 'all' ? items : items.filter(i => i.category_id === filter);
+  const list = document.getElementById('list-items');
+
+  list.innerHTML = filtered.map((item, i) => {
+    const cat = categories.find(c => c.id === item.category_id);
+    const catName = cat ? cat.name : item.category_id;
+    return `
+      <li class="sortable-item" draggable="true" data-id="${item.id}" data-index="${items.indexOf(item)}" data-collection="items">
+        <span class="drag-handle">\u2261</span>
+        <div class="item-content">
+          <div class="item-title">${esc(item.title)}</div>
+          <div class="item-meta">${esc(catName)} &middot; ${esc(item.desc || '')}</div>
+        </div>
+        <div class="item-actions">
+          <button class="btn btn-outline btn-sm" onclick="openEditItem(${items.indexOf(item)})">Edit</button>
+          <button class="btn btn-danger-outline btn-sm" onclick="deleteEntry('items','${item.id}','${esc(item.title)}')">Del</button>
+        </div>
+      </li>
+    `;
+  }).join('');
+  attachDragListeners(list);
+}
+
+function renderCuriosityCards() {
+  const list = document.getElementById('list-curiosity');
+  list.innerHTML = curiosityCards.map((card, i) => `
+    <li class="sortable-item" draggable="true" data-id="${card.id}" data-index="${i}" data-collection="curiosityCards">
+      <span class="drag-handle">\u2261</span>
+      <div class="item-content">
+        <div class="item-title">${esc(card.text)}</div>
+        <div class="item-meta">Sort: ${card.sort_order}</div>
+      </div>
+      <div class="item-actions">
+        <button class="btn btn-outline btn-sm" onclick="openEditCuriosity(${i})">Edit</button>
+        <button class="btn btn-danger-outline btn-sm" onclick="deleteEntry('curiosityCards','${card.id}','curiosity card')">Del</button>
+      </div>
+    </li>
+  `).join('');
+  attachDragListeners(list);
+}
+
+// ── Tabs ──
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab-btn[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+}
+
+// ── CRUD: Categories ──
+function openAddCategory() {
+  const html = `
+    <h3>Add Category</h3>
+    <div class="form-group">
+      <label>ID (lowercase, no spaces)</label>
+      <input type="text" id="f-cat-id" placeholder="e.g. physical">
+    </div>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="f-cat-name" placeholder="e.g. Physical Connection">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveCategory()">Save</button>
+    </div>
+  `;
+  openModal(html);
+}
+
+function openEditCategory(index) {
+  const cat = categories[index];
+  const html = `
+    <h3>Edit Category</h3>
+    <div class="form-group">
+      <label>ID</label>
+      <input type="text" id="f-cat-id" value="${esc(cat.id)}" readonly style="opacity:0.5">
+    </div>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="f-cat-name" value="${esc(cat.name)}">
+    </div>
+    <input type="hidden" id="f-cat-editing" value="${cat.id}">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveCategory()">Save</button>
+    </div>
+  `;
+  openModal(html);
+}
+
+async function saveCategory() {
+  const editing = document.getElementById('f-cat-editing');
+  const id = document.getElementById('f-cat-id').value.trim();
+  const name = document.getElementById('f-cat-name').value.trim();
+  if (!id || !name) { showToast('Fill in all fields', 'error'); return; }
+
+  const isEdit = editing && editing.value;
+  const maxSort = categories.length ? Math.max(...categories.map(c => c.sort_order)) : 0;
+
+  try {
+    const ref = db.collection('categories').doc(id);
+    if (isEdit) {
+      await ref.update({ name });
+    } else {
+      await ref.set({ name, sort_order: maxSort + 10 });
+    }
+    closeModal();
+    await refreshData();
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── CRUD: Items ──
+function openAddItem() {
+  const opts = categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  const html = `
+    <h3>Add Menu Item</h3>
+    <div class="form-group">
+      <label>ID (lowercase_snake_case)</label>
+      <input type="text" id="f-item-id" placeholder="e.g. holding_hands">
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="f-item-cat">${opts}</select>
+    </div>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="f-item-title" placeholder="e.g. Holding hands">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="f-item-desc" placeholder="Brief description"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveItem()">Save</button>
+    </div>
+  `;
+  openModal(html);
+}
+
+function openEditItem(index) {
+  const item = items[index];
+  const opts = categories.map(c =>
+    `<option value="${c.id}" ${c.id === item.category_id ? 'selected' : ''}>${esc(c.name)}</option>`
+  ).join('');
+  const html = `
+    <h3>Edit Menu Item</h3>
+    <div class="form-group">
+      <label>ID</label>
+      <input type="text" id="f-item-id" value="${esc(item.id)}" readonly style="opacity:0.5">
+    </div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="f-item-cat">${opts}</select>
+    </div>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="f-item-title" value="${esc(item.title)}">
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="f-item-desc">${esc(item.desc || '')}</textarea>
+    </div>
+    <input type="hidden" id="f-item-editing" value="${item.id}">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveItem()">Save</button>
+    </div>
+  `;
+  openModal(html);
+}
+
+async function saveItem() {
+  const editing = document.getElementById('f-item-editing');
+  const id = document.getElementById('f-item-id').value.trim();
+  const category_id = document.getElementById('f-item-cat').value;
+  const title = document.getElementById('f-item-title').value.trim();
+  const desc = document.getElementById('f-item-desc').value.trim();
+  if (!id || !title) { showToast('Fill in required fields', 'error'); return; }
+
+  const isEdit = editing && editing.value;
+  const maxSort = items.length ? Math.max(...items.map(i => i.sort_order)) : 0;
+
+  try {
+    const ref = db.collection('items').doc(id);
+    if (isEdit) {
+      await ref.update({ category_id, title, desc });
+    } else {
+      await ref.set({ category_id, title, desc, sort_order: maxSort + 10 });
+    }
+    closeModal();
+    await refreshData();
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── CRUD: Curiosity Cards ──
+function openAddCuriosity() {
+  const html = `
+    <h3>Add Curiosity Card</h3>
+    <div class="form-group">
+      <label>Text</label>
+      <textarea id="f-cc-text" placeholder="Enter the question or prompt"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveCuriosity()">Save</button>
+    </div>
+  `;
+  openModal(html);
+}
+
+function openEditCuriosity(index) {
+  const card = curiosityCards[index];
+  const html = `
+    <h3>Edit Curiosity Card</h3>
+    <div class="form-group">
+      <label>Text</label>
+      <textarea id="f-cc-text">${esc(card.text)}</textarea>
+    </div>
+    <input type="hidden" id="f-cc-editing" value="${card.id}">
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveCuriosity()">Save</button>
+    </div>
+  `;
+  openModal(html);
+}
+
+async function saveCuriosity() {
+  const editing = document.getElementById('f-cc-editing');
+  const text = document.getElementById('f-cc-text').value.trim();
+  if (!text) { showToast('Enter text', 'error'); return; }
+
+  const isEdit = editing && editing.value;
+  const id = isEdit ? editing.value : 'cc_' + Date.now();
+  const maxSort = curiosityCards.length ? Math.max(...curiosityCards.map(c => c.sort_order)) : 0;
+
+  try {
+    const ref = db.collection('curiosityCards').doc(id);
+    if (isEdit) {
+      await ref.update({ text });
+    } else {
+      await ref.set({ text, sort_order: maxSort + 10 });
+    }
+    closeModal();
+    await refreshData();
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── Delete ──
+async function deleteEntry(collection, id, label) {
+  if (!confirm(`Delete "${label}"? This cannot be undone.`)) return;
+  try {
+    await db.collection(collection).doc(id).delete();
+    await refreshData();
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+// ── Drag & Drop Reorder ──
+function attachDragListeners(list) {
+  const items = list.querySelectorAll('.sortable-item');
+  items.forEach(item => {
+    item.addEventListener('dragstart', handleDragStart);
+    item.addEventListener('dragover', handleDragOver);
+    item.addEventListener('dragenter', handleDragEnter);
+    item.addEventListener('dragleave', handleDragLeave);
+    item.addEventListener('drop', handleDrop);
+    item.addEventListener('dragend', handleDragEnd);
+  });
+}
+
+function handleDragStart(e) {
+  dragSrcEl = this;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', this.dataset.id);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragEnter(e) {
+  e.preventDefault();
+  if (this !== dragSrcEl && this.dataset.collection === dragSrcEl.dataset.collection) {
+    this.classList.add('drag-over');
+  }
+}
+
+function handleDragLeave() {
+  this.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  this.classList.remove('drag-over');
+
+  if (this === dragSrcEl) return;
+  if (this.dataset.collection !== dragSrcEl.dataset.collection) return;
+
+  const collection = this.dataset.collection;
+  const srcId = dragSrcEl.dataset.id;
+  const targetId = this.dataset.id;
+
+  reorderEntry(collection, srcId, targetId);
+}
+
+function handleDragEnd() {
+  document.querySelectorAll('.sortable-item').forEach(item => {
+    item.classList.remove('dragging', 'drag-over');
+  });
+}
+
+async function reorderEntry(collection, srcId, targetId) {
+  let arr;
+  if (collection === 'categories') arr = categories;
+  else if (collection === 'items') arr = items;
+  else arr = curiosityCards;
+
+  const srcIdx = arr.findIndex(x => x.id === srcId);
+  const targetIdx = arr.findIndex(x => x.id === targetId);
+  if (srcIdx === -1 || targetIdx === -1) return;
+
+  // Move item in local array
+  const [moved] = arr.splice(srcIdx, 1);
+  arr.splice(targetIdx, 0, moved);
+
+  // Recalculate sort orders and update locally
+  arr.forEach((item, i) => { item.sort_order = (i + 1) * 10; });
+  renderAll();
+
+  // Persist to Firestore via batch
+  try {
+    const batch = db.batch();
+    arr.forEach((item, i) => {
+      const ref = db.collection(collection).doc(item.id);
+      batch.update(ref, { sort_order: (i + 1) * 10 });
+    });
+    await batch.commit();
+    showToast('Reordered', 'success');
+  } catch (e) {
+    showToast('Reorder failed: ' + e.message, 'error');
+    await refreshData();
+  }
+}
+
+// ── Modal ──
+function openModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+// ── Toast ──
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.classList.add('show');
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Helpers ──
+function esc(s) {
+  if (!s) return '';
+  const el = document.createElement('span');
+  el.textContent = s;
+  return el.innerHTML;
+}
+</script>
+</body>
+</html>
